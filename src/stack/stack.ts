@@ -5,10 +5,6 @@ export class Stack<T> extends LinkedList<T> {
         return this.first;
     }
 
-    public get pop(): Stack<T> | undefined {
-        return this.rest;
-    }
-
     public override get rest(): Stack<T> | undefined {
         return super.rest as Stack<T>;
     }
@@ -17,20 +13,19 @@ export class Stack<T> extends LinkedList<T> {
         super(element, stack);
     }
 
-    public static push<T>(element: T, stack: Stack<T>) {
+    public static push<T>(element: T, stack: Stack<T>): Stack<T> {
         return this.create<T>(element, stack);
     }
 
-    public static override create<T>(element: T, stack: Stack<T>) {
-        return new Stack<T>(element, stack);
+    public static override create<T>(element: T, stack?: Stack<T>): Stack<T> {
+        return new Stack<T>(element, stack ?? Stack.empty<T>());
     }
 
     public static override from<T>(iterable: Iterable<T>): Stack<T> {
-        const empty = this.empty<T>();
         let res: Stack<T> | undefined = undefined;
 
         for (const a of iterable) {
-            const b = this.create(a, empty);
+            const b = this.create(a);
 
             if (res === undefined) {
                 res = b;
@@ -44,6 +39,10 @@ export class Stack<T> extends LinkedList<T> {
 
     public static override empty<T>() {
         return new Stack<T>();
+    }
+
+    public pop(): Stack<T> | undefined {
+        return this.rest;
     }
 
     public override append(list: Stack<T>): Stack<T> {

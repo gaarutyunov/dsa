@@ -31,8 +31,8 @@ export class LinkedList<T> {
 		this._list = list;
 	}
 
-	public static create<T>(element: T, list: LinkedList<T>): LinkedList<T> {
-		return new LinkedList<T>(element, list);
+	public static create<T>(element: T, list?: LinkedList<T>): LinkedList<T> {
+		return new LinkedList<T>(element, list ?? this.empty<T>());
 	}
 
 	public static empty<T>(): LinkedList<T> {
@@ -40,11 +40,10 @@ export class LinkedList<T> {
 	}
 
 	public static from<T>(iterable: Iterable<T>): LinkedList<T> {
-		const empty = this.empty<T>();
 		let res: LinkedList<T> | undefined = undefined;
 
 		for (const a of iterable) {
-			const b = this.create(a, empty);
+			const b = this.create(a);
 
 			if (res === undefined) {
 				res = b;
@@ -56,8 +55,10 @@ export class LinkedList<T> {
 		return res!;
 	}
 
-	public replaceRest(list: LinkedList<T>): void {
+	public replaceRest(list: LinkedList<T>): this {
 		this._list = list;
+
+		return this;
 	}
 
 	public append(list: LinkedList<T>): LinkedList<T> {

@@ -10,7 +10,7 @@ fmt: ## format all files
 lint: ## lint all files
 	@deno lint
 
-test: ## test all with coverage
+test: clean-cov ## test all with coverage
 	@deno test --coverage=cov_profile --parallel
 	@deno coverage --lcov --output=cov_profile.lcov cov_profile/
 	@genhtml -o html_cov cov_profile.lcov
@@ -18,7 +18,12 @@ test: ## test all with coverage
 cov: ## display coverage in browser
 	@open html_cov/index.html
 
-g: ## generate implementation
+clean-cov: ## clean coverage reports
+	@rm -rf cov_profile | true
+	@rm -rf html_cov | true
+	@rm cov_profile.lcov | true
+
+g: ## generate implementation (options: name - name of section to generate)
 	@mkdir src/$(name)
 	@touch src/$(name)/$(name).ts
 	@touch src/$(name)/$(name)_test.ts
