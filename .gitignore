@@ -1,0 +1,5 @@
+.DS_Store
+cov_profile*
+html_cov
+.idea
+.vscode
