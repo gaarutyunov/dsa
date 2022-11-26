@@ -1,6 +1,8 @@
 # Data Structures and Algorithms
 
-Implementations of data structures and algorithms from [lectures notes](https://www.cs.bham.ac.uk/~jxb/DSA/dsa.pdf).
+Implementations of data structures and algorithms
+with [TypeScript](https://www.typescriptlang.org/download) 
+and [Deno](https://deno.land/manual@v1.28.2/getting_started/installation).
 
 ## Usage
 
@@ -19,5 +21,14 @@ make test
 3. Display coverage
 
 ```shell
-open html_cov/index.html
+make cov
 ```
+
+4. All available commands
+```shell
+make help
+```
+
+## Sources
+
+* [lectures notes](https://www.cs.bham.ac.uk/~jxb/DSA/dsa.pdf) 

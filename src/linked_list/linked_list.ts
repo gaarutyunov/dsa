@@ -23,10 +23,10 @@ export class LinkedList<T> {
 		return this._list!.last;
 	}
 
-	private readonly _element?: T;
-	private _list?: LinkedList<T>;
+	protected readonly _element?: T;
+	protected _list?: LinkedList<T>;
 
-	private constructor(element?: T, list?: LinkedList<T>) {
+	protected constructor(element?: T, list?: LinkedList<T>) {
 		this._element = element;
 		this._list = list;
 	}
@@ -44,7 +44,7 @@ export class LinkedList<T> {
 		let res: LinkedList<T> | undefined = undefined;
 
 		for (const a of iterable) {
-			const b = LinkedList.create(a, empty);
+			const b = this.create(a, empty);
 
 			if (res === undefined) {
 				res = b;
@@ -72,7 +72,7 @@ export class LinkedList<T> {
 		return this._appendString('');
 	}
 
-	private _appendString(s: string): string {
+	protected _appendString(s: string): string {
 		if (this.isEmpty && s.length === 0) {
 			return '[x]';
 		}
