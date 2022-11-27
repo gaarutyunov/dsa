@@ -25,16 +25,18 @@ Deno.test('LinkedList', async (t) => {
 		},
 		{
 			actual: LinkedList.from([1, 2, 3, 4]).last as number,
-			expected: '4'
+			expected: '4',
 		},
 		{
 			actual: LinkedList.empty().last,
-			expected: 'undefined'
+			expected: 'undefined',
 		},
 		{
-			actual: LinkedList.from([1, 2, 3, 4]).replaceRest(LinkedList.from([5, 6, 7])),
-			expected: '[1|*]->[5|*]->[6|*]->[7|/]'
-		}
+			actual: LinkedList.from([1, 2, 3, 4]).replaceRest(
+				LinkedList.from([5, 6, 7]),
+			),
+			expected: '[1|*]->[5|*]->[6|*]->[7|/]',
+		},
 	];
 
 	await Promise.all(testCases.map(async ({ actual, expected }, i) => {
