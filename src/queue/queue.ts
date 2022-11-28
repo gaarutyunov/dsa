@@ -1,97 +1,137 @@
-import { LinkedList } from '../linked_list/linked_list.ts';
-import { Stack } from '../stack/stack.ts';
+import { BaseLinkedList, ILinkedList } from '../base/base_linked_list.ts';
 
-class TwoCell<T> {
-	public get end(): LinkedList<T> {
+/**
+ * A two-cell holding references to start and end of a queue
+ */
+class TwoCell<T, TL extends ILinkedList<T>> {
+	/**
+	 * Reference to end of queue
+	 */
+	public get end(): TL {
 		return this._end;
 	}
 
-	public set end(value: LinkedList<T>) {
+	/**
+	 * Setter for end of queue
+	 * @param value
+	 */
+	public set end(value: TL) {
 		this._end = value;
 	}
 
-	public readonly start: LinkedList<T>;
-	private _end: LinkedList<T>;
+	/**
+	 * Reference to queue start
+	 */
+	public readonly start: TL;
+	private _end: TL;
 
-	constructor(start: LinkedList<T>, end: LinkedList<T>) {
+	constructor(start: TL, end: TL) {
 		this.start = start;
 		this._end = end;
 	}
 }
 
-export class Queue<T> extends Stack<T> {
-	public get top(): T | undefined {
-		return this.first;
-	}
-
+/**
+ * A linked list that models FIFO (First-In-First-Out) strategy
+ */
+export class Queue<T> extends BaseLinkedList<T, Queue<T>> {
+	/**
+	 * Get last element in queue
+	 */
 	public get last(): T | undefined {
-		return this._twoCell.end.first;
+		return this._twoCell.end._element;
 	}
 
-	public override get rest(): Queue<T> | undefined {
-		return super.rest as Queue<T> | undefined;
+	/**
+	 * Get top element in queue
+	 */
+	public get top(): T | undefined {
+		return this._twoCell.start._element;
 	}
 
-	private readonly _twoCell: TwoCell<T>;
+	/**
+	 * A two-cell holding references to start and end of a queue
+	 * @private
+	 */
+	private readonly _twoCell: TwoCell<T, this>;
 
+	/**
+	 * @inheritDoc
+	 */
 	protected constructor(element?: T, queue?: Queue<T>) {
 		super(element, queue);
 
-		this._twoCell = new TwoCell<T>(this, this);
+		this._twoCell = new TwoCell<T, this>(this, this);
 	}
 
-	public static override empty<T>(): Queue<T> {
-		return new Queue<T>();
-	}
+	/**
+	 * Pushes element to the end of a queue
+	 * @param element
+	 * @param queue
+	 */
+	public static push<T>(
+		element: T,
+		queue?: Queue<T>,
+	): Queue<T> {
+		if (queue === undefined) {
+			return new Queue<T>(element, this.empty<T, Queue<T>>());
+		}
 
-	public static override create<T>(element: T, queue?: Queue<T>): Queue<T> {
-		if (queue === undefined) return new Queue<T>(element, Queue.empty<T>());
-
-		const newRest = Queue.create(element);
+		const newRest = this.push<T>(element);
 		queue._twoCell.end.replaceRest(newRest);
 		queue._twoCell.end = newRest;
 
 		return queue;
 	}
 
-	public static push<T>(element: T, queue: Queue<T>): Queue<T> {
-		return this.create<T>(element, queue);
-	}
-
-	public static override from<T>(iterable: Iterable<T>): Queue<T> {
+	/**
+	 * Creates a queue from Iterable
+	 * @param iterable
+	 */
+	public static from<T>(iterable: Iterable<T>): Queue<T> {
 		let res: Queue<T> | undefined = undefined;
 
 		for (const a of iterable) {
-			res = this.create(a, res);
+			res = this.push(a, res);
 		}
 
 		return res!;
 	}
 
-	public override append(queue: Queue<T>): Queue<T> {
+	/**
+	 * Appends another queue at the end
+	 * @param queue
+	 */
+	public append(queue: Queue<T>): Queue<T> {
 		if (this.isEmpty) {
 			return queue;
 		}
 
-		const newRest = this.rest!.append(queue);
+		const newRest = this._list!.append(queue);
 
-		const newQueue = new Queue<T>(this!.first!, newRest);
+		const newQueue = new Queue<T>(this!.top!, newRest);
 		newQueue._twoCell.end = queue._twoCell.end;
 
 		return newQueue;
 	}
 
+	/**
+	 * Returns the queue without top element
+	 */
 	public pop(): Queue<T> {
 		if (this._twoCell.start === this._twoCell.end) {
 			return this;
 		}
 
-		const newQueue = new Queue<T>(this.rest!.first!, this.rest!.rest);
+		const newQueue = new Queue<T>(this._list!._element!, this._list!._list);
 		newQueue._twoCell.end = this._twoCell.end;
 
 		return newQueue;
 	}
 
+	/**
+	 * @inheritDoc
+	 */
 	protected override _appendString(s: string): string {
 		if (this.isEmpty && s.length === 0) {
 			return '[x]';
@@ -109,14 +149,14 @@ export class Queue<T> extends Stack<T> {
 		}
 
 		if (s.length === 0) {
-			s += `[${this.first}(S`;
+			s += `[${this.top}(S`;
 		} else {
 			if (s.endsWith('S')) {
 				s += ')';
 			}
-			s += `|*]->[${this.first}`;
+			s += `|*]->[${this.top}`;
 		}
 
-		return this.rest!._appendString(s);
+		return this._list!._appendString(s);
 	}
 }

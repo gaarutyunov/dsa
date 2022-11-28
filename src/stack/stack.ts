@@ -1,55 +1,50 @@
-import { LinkedList } from '../linked_list/linked_list.ts';
+import { BaseLinkedList } from '../base/base_linked_list.ts';
 
-export class Stack<T> extends LinkedList<T> {
+/**
+ * A linked list to model LIFO (Last-In-Last-Out)
+ */
+export class Stack<T> extends BaseLinkedList<T, Stack<T>> {
+	/**
+	 * Get the top element of stack
+	 */
 	public get top(): T | undefined {
-		return this.first;
+		return this._element;
 	}
 
-	public override get rest(): Stack<T> | undefined {
-		return super.rest as Stack<T>;
+	/**
+	 * Get the stack without the top element
+	 */
+	public get pop(): Stack<T> | undefined {
+		return this._list;
 	}
 
+	/**
+	 * @inheritDoc
+	 */
 	protected constructor(element?: T, stack?: Stack<T>) {
 		super(element, stack);
 	}
 
-	public static push<T>(element: T, stack: Stack<T>): Stack<T> {
-		return this.create<T>(element, stack);
+	/**
+	 * Pushes an element to the end of a stack or creates a new one
+	 * @param element
+	 * @param stack
+	 */
+	public static push<T>(element: T, stack?: Stack<T>): Stack<T> {
+		return new Stack<T>(element, stack ?? this.empty<T, Stack<T>>());
 	}
 
-	public static override create<T>(element: T, stack?: Stack<T>): Stack<T> {
-		return new Stack<T>(element, stack ?? Stack.empty<T>());
-	}
-
-	public static override from<T>(iterable: Iterable<T>): Stack<T> {
+	/**
+	 * Creates a stack from an iterable
+	 * @param iterable
+	 */
+	public static from<T>(iterable: Iterable<T>): Stack<T> {
 		let res: Stack<T> | undefined = undefined;
 
 		for (const a of iterable) {
-			const b = this.create(a);
-
-			if (res === undefined) {
-				res = b;
-			} else {
-				res = res.append(b);
-			}
+			res = this.push(a, res);
 		}
 
 		return res!;
-	}
-
-	public static override empty<T>() {
-		return new Stack<T>();
-	}
-
-	public pop(): Stack<T> | undefined {
-		return this.rest;
-	}
-
-	public override append(list: Stack<T>): Stack<T> {
-		if (this.isEmpty) {
-			return list;
-		}
-
-		return Stack.create<T>(list.top!, this);
 	}
 }

@@ -1,116 +1,105 @@
-import { LinkedList } from '../linked_list/linked_list.ts';
+import { BaseLinkedList } from '../base/base_linked_list.ts';
 
-export class DoublyLinkedList<T> extends LinkedList<T> {
-	public override get isEmpty(): boolean {
-		return this._element === undefined &&
-			(this._list === undefined || this._listLeft === undefined);
-	}
-
-	public get firstRight(): T | undefined {
-		if (this.restRight === undefined || this.restRight.isEmpty) {
-			return this.first;
-		}
-
-		let list = this.restRight;
-
-		while (
-			list !== undefined && list.restRight !== undefined &&
-			!list.restRight.isEmpty
-		) {
-			list = list.restRight!;
-		}
-
-		return list!.first;
-	}
-
+/**
+ * A linked list that contains a reference to values before and after current value
+ */
+export class DoublyLinkedList<T>
+	extends BaseLinkedList<T, DoublyLinkedList<T>> {
+	/**
+	 * Gets the values to the right
+	 */
 	public get restRight(): DoublyLinkedList<T> | undefined {
-		return this.rest;
+		return this._list;
 	}
 
-	public override get rest(): DoublyLinkedList<T> | undefined {
-		return super.rest as DoublyLinkedList<T>;
-	}
-
-	public get firstLeft(): T | undefined {
-		if (this.restLeft === undefined || this.restLeft.isEmpty) {
-			return this.first;
-		}
-
-		let list = this.restLeft;
-
-		while (
-			list !== undefined && list.restLeft !== undefined &&
-			!list.restLeft.isEmpty
-		) {
-			list = list.restLeft!;
-		}
-
-		return list!.first;
-	}
-
+	/**
+	 * Gets the values to the left
+	 */
 	public get restLeft(): DoublyLinkedList<T> | undefined {
 		return this._listLeft;
 	}
 
+	/**
+	 * Holds reference to the list on the left
+	 * @protected
+	 */
 	protected _listLeft?: DoublyLinkedList<T>;
 
+	/**
+	 * Creates an instance of a doubly-linked list
+	 * @param element
+	 * @param list
+	 * @param appendLeft - when true appends a value to the left
+	 * @protected
+	 */
 	protected constructor(
 		element?: T,
 		list?: DoublyLinkedList<T>,
-		rightHanded?: boolean,
+		appendLeft?: boolean,
 	) {
-		const isRightHanded = rightHanded === true;
-		super(element, undefined);
+		const appendedLeft = appendLeft === true;
+		super(element);
 
-		if (isRightHanded) {
+		if (appendedLeft) {
 			this._list = list;
 		} else {
 			this._listLeft = list;
 		}
 
-		if (list !== undefined && isRightHanded) {
+		if (list !== undefined && appendedLeft) {
 			list._listLeft = this;
 		}
 
-		if (list !== undefined && !isRightHanded) {
+		if (list !== undefined && !appendedLeft) {
 			list._list = this;
 		}
 	}
 
-	public static override empty<T>(): DoublyLinkedList<T> {
-		return new DoublyLinkedList<T>();
-	}
-
-	public static override create<T>(
+	/**
+	 * Creates a list by appending a value to the left
+	 * @param element
+	 * @param list
+	 */
+	public static createLeft<T>(
 		element: T,
 		list?: DoublyLinkedList<T>,
-		rightHanded?: boolean,
 	): DoublyLinkedList<T> {
-		if (rightHanded === true && list !== undefined) {
-			while (list.restLeft !== undefined && !list.restLeft.isEmpty) {
-				list = list.restLeft;
-			}
-		}
-
-		if (rightHanded === false && list !== undefined) {
-			while (list.restRight !== undefined && !list.restRight.isEmpty) {
-				list = list.restRight;
-			}
-		}
+		list = list?.traverseLeft() ?? this.empty<T, DoublyLinkedList<T>>();
 
 		const newList = new DoublyLinkedList<T>(
 			element,
-			list ?? this.empty(),
-			rightHanded,
+			list,
+			true,
 		);
-		const empty = this.empty<T>();
+		const empty = this.empty<T, DoublyLinkedList<T>>();
 
-		if (rightHanded === true && newList._listLeft === undefined) {
+		if (newList._listLeft === undefined) {
 			empty._list = newList;
 			newList._listLeft = empty;
 		}
 
-		if (rightHanded === false && newList._list === undefined) {
+		return newList;
+	}
+
+	/**
+	 * Create a list appending a value to the right
+	 * @param element
+	 * @param list
+	 */
+	public static createRight<T>(
+		element: T,
+		list?: DoublyLinkedList<T>,
+	): DoublyLinkedList<T> {
+		list = list?.traverseRight() ?? this.empty<T, DoublyLinkedList<T>>();
+
+		const newList = new DoublyLinkedList<T>(
+			element,
+			list,
+			false,
+		);
+		const empty = this.empty<T, DoublyLinkedList<T>>();
+
+		if (newList._list === undefined) {
 			empty._listLeft = newList;
 			newList._list = empty;
 		}
@@ -118,21 +107,11 @@ export class DoublyLinkedList<T> extends LinkedList<T> {
 		return newList;
 	}
 
-	public static createLeft<T>(
-		element: T,
-		list?: DoublyLinkedList<T>,
-	): DoublyLinkedList<T> {
-		return this.create(element, list, true);
-	}
-
-	public static createRight<T>(
-		element: T,
-		list?: DoublyLinkedList<T>,
-	): DoublyLinkedList<T> {
-		return this.create(element, list, false);
-	}
-
-	public static override from<T>(iterable: Iterable<T>): DoublyLinkedList<T> {
+	/**
+	 * Creates a list from an iterable
+	 * @param iterable
+	 */
+	public static from<T>(iterable: Iterable<T>): DoublyLinkedList<T> {
 		let res: DoublyLinkedList<T> | undefined = undefined;
 
 		for (const a of iterable) {
@@ -142,13 +121,26 @@ export class DoublyLinkedList<T> extends LinkedList<T> {
 		return res!;
 	}
 
-	public override append(
+	/**
+	 * Appends a list to the right edge
+	 * @param list
+	 */
+	public append(
 		list: DoublyLinkedList<T>,
-		rightHanded?: boolean,
 	): DoublyLinkedList<T> {
-		throw new Error('append not implemented');
+		const listToAppend = this.traverseRight();
+		list = list.traverseLeft();
+
+		listToAppend.replaceRest(
+			list,
+		);
+
+		return listToAppend;
 	}
 
+	/**
+	 * @inheritDoc
+	 */
 	public override toString(): string {
 		if (this._listLeft !== undefined) {
 			return this._listLeft.toString();
@@ -157,6 +149,46 @@ export class DoublyLinkedList<T> extends LinkedList<T> {
 		return super.toString();
 	}
 
+	/**
+	 * Go to the left edge of the doubly-linked list
+	 * @protected
+	 */
+	protected traverseLeft(): DoublyLinkedList<T> {
+		let list: DoublyLinkedList<T>;
+		list = this;
+
+		while (
+			list.restLeft !== undefined &&
+			!list.restLeft.isEmpty
+		) {
+			list = list.restLeft!;
+		}
+
+		return list;
+	}
+
+	/**
+	 * Go to the right edge of the doubly-linked list
+	 * @protected
+	 */
+	protected traverseRight(): DoublyLinkedList<T> {
+		let list: DoublyLinkedList<T>;
+		list = this;
+
+		while (
+			list.restRight !== undefined &&
+			!list.restRight.isEmpty
+		) {
+			list = list.restRight!;
+		}
+
+		return list;
+	}
+
+	/**
+	 * @inheritDoc
+	 * @protected
+	 */
 	protected override _appendString(s: string): string {
 		if (
 			this.isEmpty && this.restLeft === undefined &&
@@ -167,7 +199,7 @@ export class DoublyLinkedList<T> extends LinkedList<T> {
 
 		if (this.isEmpty && this.restRight !== undefined) {
 			s += '[/|';
-			return this.rest!._appendString(s);
+			return this._list!._appendString(s);
 		}
 
 		if (this.isEmpty && this.restRight === undefined) {
@@ -176,11 +208,11 @@ export class DoublyLinkedList<T> extends LinkedList<T> {
 		}
 
 		if (s === '[/|') {
-			s += `${this.first}`;
+			s += `${this._element}`;
 		} else {
-			s += `|*]<->[*|${this.first}`;
+			s += `|*]<->[*|${this._element}`;
 		}
 
-		return this.rest!._appendString(s);
+		return this._list!._appendString(s);
 	}
 }

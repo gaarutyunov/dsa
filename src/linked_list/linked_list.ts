@@ -1,16 +1,26 @@
-export class LinkedList<T> {
-	public get isEmpty(): boolean {
-		return this._element === undefined && this._list === undefined;
-	}
+import { BaseLinkedList } from '../base/base_linked_list.ts';
 
+/**
+ * The most simple linked list
+ */
+export class LinkedList<T> extends BaseLinkedList<T, LinkedList<T>> {
+	/**
+	 * Get the first value of the linked list
+	 */
 	public get first(): T | undefined {
 		return this._element;
 	}
 
+	/**
+	 * Gets the rest of values
+	 */
 	public get rest(): LinkedList<T> | undefined {
 		return this._list;
 	}
 
+	/**
+	 * Gets the last value of the linked list
+	 */
 	public get last(): T | undefined {
 		if (this.isEmpty) {
 			return undefined;
@@ -23,72 +33,41 @@ export class LinkedList<T> {
 		return this._list!.last;
 	}
 
-	protected readonly _element?: T;
-	protected _list?: LinkedList<T>;
-
-	protected constructor(element?: T, list?: LinkedList<T>) {
-		this._element = element;
-		this._list = list;
-	}
-
+	/**
+	 * Pushes an element to a list or creates a new one
+	 * @param element
+	 * @param list
+	 */
 	public static create<T>(element: T, list?: LinkedList<T>): LinkedList<T> {
-		return new LinkedList<T>(element, list ?? this.empty<T>());
+		return new LinkedList<T>(
+			element,
+			list ?? this.empty<T, LinkedList<T>>(),
+		);
 	}
 
-	public static empty<T>(): LinkedList<T> {
-		return new LinkedList<T>();
-	}
-
+	/**
+	 * Creates a linked list from an itrable
+	 * @param iterable
+	 */
 	public static from<T>(iterable: Iterable<T>): LinkedList<T> {
-		let res: LinkedList<T> | undefined = undefined;
+		let res: LinkedList<T> = this.empty<T, LinkedList<T>>();
 
 		for (const a of iterable) {
-			const b = this.create(a);
-
-			if (res === undefined) {
-				res = b;
-			} else {
-				res = res.append(b);
-			}
+			res = res.append(this.create(a));
 		}
 
 		return res!;
 	}
 
-	public replaceRest(list: LinkedList<T>): this {
-		this._list = list;
-
-		return this;
-	}
-
+	/**
+	 * Appends a list to the end
+	 * @param list
+	 */
 	public append(list: LinkedList<T>): LinkedList<T> {
 		if (this.isEmpty) {
 			return list;
 		}
 
 		return LinkedList.create<T>(this.first!, this.rest!.append(list));
-	}
-
-	public toString(): string {
-		return this._appendString('');
-	}
-
-	protected _appendString(s: string): string {
-		if (this.isEmpty && s.length === 0) {
-			return '[x]';
-		}
-
-		if (this.isEmpty && s.length > 0) {
-			s += '|/]';
-			return s;
-		}
-
-		if (s.length === 0) {
-			s += `[${this.first}`;
-		} else {
-			s += `|*]->[${this.first}`;
-		}
-
-		return this._list!._appendString(s);
 	}
 }
