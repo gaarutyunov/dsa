@@ -1,7 +1,7 @@
 .DEFAULT_GOAL := help
 
 .PHONY: help
-help:
+help: ## display help
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
 fmt: ## format all files
@@ -9,6 +9,11 @@ fmt: ## format all files
 
 lint: ## lint all files
 	@deno lint
+
+clean-cov: ## clean coverage reports
+	@rm -rf cov_profile | true
+	@rm -rf html_cov | true
+	@rm cov_profile.lcov | true
 
 test: clean-cov ## test all with coverage
 	@deno test --coverage=cov_profile --parallel
@@ -18,10 +23,7 @@ test: clean-cov ## test all with coverage
 cov: ## display coverage in browser
 	@open html_cov/index.html
 
-clean-cov: ## clean coverage reports
-	@rm -rf cov_profile | true
-	@rm -rf html_cov | true
-	@rm cov_profile.lcov | true
+test-cov: test cov ## run tests and display coverage
 
 g: ## generate implementation (options: name - name of section to generate)
 	@mkdir src/$(name)

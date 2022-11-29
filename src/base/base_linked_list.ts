@@ -38,8 +38,8 @@ export class BaseLinkedList<T, TL extends ILinkedList<T> = ILinkedList<T>>
 
 	/**
 	 * Creates an instance of linked-list
-	 * @param element - underlying value
-	 * @param list - reference to another linked-list
+	 * @param element underlying value
+	 * @param list reference to another linked-list
 	 * @protected
 	 */
 	protected constructor(element?: T, list?: TL) {
@@ -56,7 +56,7 @@ export class BaseLinkedList<T, TL extends ILinkedList<T> = ILinkedList<T>>
 
 	/**
 	 * Replace reference to list
-	 * @param list - list to replace by
+	 * @param list list to replace by
 	 */
 	public replaceRest(list: TL): this {
 		this._list = list;
@@ -73,7 +73,7 @@ export class BaseLinkedList<T, TL extends ILinkedList<T> = ILinkedList<T>>
 
 	/**
 	 * Recursively appends tokens to string representation
-	 * @param acc - string accumulation
+	 * @param acc string accumulation
 	 * @protected
 	 */
 	protected _appendString(acc: string): string {

@@ -29,7 +29,7 @@ export class DoublyLinkedList<T>
 	 * Creates an instance of a doubly-linked list
 	 * @param element
 	 * @param list
-	 * @param appendLeft - when true appends a value to the left
+	 * @param appendLeft when true appends a value to the left
 	 * @protected
 	 */
 	protected constructor(
