@@ -1,5 +1,7 @@
 # Data Structures and Algorithms
 
+[![codecov](https://codecov.io/gh/gaarutyunov/dsa/branch/main/graph/badge.svg?token=SSTV4U1GE4)](https://codecov.io/gh/gaarutyunov/dsa)
+
 Implementations of data structures and algorithms
 with [TypeScript](https://www.typescriptlang.org/download) 
 and [Deno](https://deno.land/manual@v1.28.2/getting_started/installation).
