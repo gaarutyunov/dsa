@@ -7,13 +7,22 @@ help: ## display help
 fmt: ## format all files
 	@deno fmt
 
+fmt-check: ## check format
+	@deno fmt --check
+
 lint: ## lint all files
 	@deno lint
+
+check: fmt-check lint ## check format and lint files
 
 clean-cov: ## clean coverage reports
 	@rm -rf cov_profile | true
 	@rm -rf html_cov | true
 	@rm cov_profile.lcov | true
+
+ci: ## run tests
+	@deno test --coverage=cov_profile --parallel
+	@deno coverage --lcov --output=cov_profile.lcov cov_profile/
 
 test: clean-cov ## test all with coverage
 	@deno test --coverage=cov_profile --parallel
