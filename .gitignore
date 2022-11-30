@@ -3,3 +3,4 @@ cov_profile*
 html_cov
 .idea
 .vscode
+doc.json

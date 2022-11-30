@@ -38,3 +38,6 @@ g: ## generate implementation (options: name - name of section to generate)
 	@mkdir src/$(name)
 	@touch src/$(name)/$(name).ts
 	@touch src/$(name)/$(name)_test.ts
+
+doc: ## generate documentation json
+	@deno doc --json > doc.json

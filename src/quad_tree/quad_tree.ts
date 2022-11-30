@@ -17,7 +17,8 @@ import { BaseChildrenProxy, BaseTree } from '../base/base_tree.ts';
  * | 4 | 3 |
  * ```
  */
-class QuadTreeChildrenProxy<T> extends BaseChildrenProxy<T, QuadTree<T>> {
+export class QuadTreeChildrenProxy<T>
+	extends BaseChildrenProxy<T, QuadTree<T>> {
 	/**
 	 * Left-upper child of the tree. `1` in the example
 	 */

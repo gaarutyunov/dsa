@@ -1,7 +1,11 @@
 /**
  * Interface for trees
  */
-interface ITree<T> {
+export interface ITree<T> {
+	/**
+	 * Underlying node value
+	 */
+	value?: T;
 	/**
 	 Get parent of the tree.
 	 Returns undefined when the tree has no parent.
@@ -26,10 +30,24 @@ interface ITree<T> {
 	get allChildren(): this[];
 }
 
+export interface ITreeChildrenProxy<T, TT extends ITree<T> = ITree<T>> {
+	/**
+	 * Get number of children
+	 */
+	get length(): number;
+
+	/**
+	 * Get child by index
+	 * @param index
+	 */
+	get(index: number): TT | undefined;
+}
+
 /**
  * Base tree's children proxy, that exposes an iterator
  */
-export abstract class BaseChildrenProxy<T, TT extends ITree<T> = ITree<T>> {
+export abstract class BaseChildrenProxy<T, TT extends ITree<T> = ITree<T>>
+	implements ITreeChildrenProxy<T, TT> {
 	/**
 	 * Get number of tree's children
 	 */
@@ -63,7 +81,7 @@ export abstract class BaseChildrenProxy<T, TT extends ITree<T> = ITree<T>> {
  */
 export abstract class BaseTree<
 	T,
-	TC extends BaseChildrenProxy<T>,
+	TC extends ITreeChildrenProxy<T> = ITreeChildrenProxy<T>,
 > implements ITree<T> {
 	/**
 	 * @inheritDoc

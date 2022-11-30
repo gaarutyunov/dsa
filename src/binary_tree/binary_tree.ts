@@ -1,4 +1,4 @@
-import { BaseChildrenProxy, BaseTree } from '../base/base_tree.ts';
+import { BaseChildrenProxy, BaseTree, ITree } from '../base/base_tree.ts';
 
 /**
  * @internal
@@ -12,9 +12,33 @@ export type ValueAndChildren<T> =
 	| [Value<T>]
 	| [Value<T>, [ValueAndChildren<T>, ValueAndChildren<T>]];
 
+/**
+ * Interface for binary trees
+ */
+interface IBinaryTree<T> extends ITree<T> {
+	/**
+	 * Checks whether binary tree has no children
+	 */
+	get isEmpty(): boolean;
+
+	/**
+	 * Get the size of the tree, i.e. the number of nodes
+	 */
+	get size(): number;
+
+	/**
+	 * Equality for binary trees
+	 * @param other tree to compare with
+	 */
+	equals(other?: this): boolean;
+}
+
+/**
+ * An accessor for binary tree's children
+ */
 export class BinaryTreeChildrenProxy<
 	T,
-	TT extends BinaryTree<T> = BinaryTree<T>,
+	TT extends IBinaryTree<T> = IBinaryTree<T>,
 > extends BaseChildrenProxy<T, TT> {
 	/**
 	 * Returns left child of a binary tree
@@ -31,9 +55,22 @@ export class BinaryTreeChildrenProxy<
 	}
 }
 
-export class BinaryTree<T> extends BaseTree<T, BinaryTreeChildrenProxy<T>> {
+/**
+ * A tree with two children
+ */
+export class BinaryTree<
+	T,
+	TC extends BinaryTreeChildrenProxy<T> = BinaryTreeChildrenProxy<T>,
+> extends BaseTree<T, BinaryTreeChildrenProxy<T>> implements IBinaryTree<T> {
 	/**
-	 * Checks whether binary tree has no children
+	 * Checks whether a node is a leaf
+	 */
+	public get isLeaf(): boolean {
+		return this.allChildren.every((x) => x.isEmpty);
+	}
+
+	/**
+	 * @inheritDoc
 	 */
 	public get isEmpty(): boolean {
 		return this.allChildren.length === 0;
@@ -42,12 +79,12 @@ export class BinaryTree<T> extends BaseTree<T, BinaryTreeChildrenProxy<T>> {
 	/**
 	 * @inheritDoc
 	 */
-	public get children(): BinaryTreeChildrenProxy<T> {
-		return new BinaryTreeChildrenProxy<T>(this);
+	public get children(): TC {
+		return new BinaryTreeChildrenProxy<T, this>(this) as unknown as TC;
 	}
 
 	/**
-	 * Get the size of the tree, i.e. the number of nodes
+	 * @inheritDoc
 	 */
 	public get size(): number {
 		if (this.isEmpty) return 0;
@@ -87,10 +124,9 @@ export class BinaryTree<T> extends BaseTree<T, BinaryTreeChildrenProxy<T>> {
 	}
 
 	/**
-	 * Equality for binary trees
-	 * @param other tree to compare with
+	 * @inheritDoc
 	 */
-	public equals(other?: BinaryTree<T>): boolean {
+	public equals(other?: this): boolean {
 		if (!other) {
 			return false;
 		}

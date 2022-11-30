@@ -93,7 +93,7 @@ Deno.test('BinaryTree', async (t) => {
 		},
 		{
 			actual: () =>
-				BinaryTree.create(
+				(BinaryTree.create(
 					1,
 					BinaryTree.create(
 						2,
@@ -105,7 +105,7 @@ Deno.test('BinaryTree', async (t) => {
 						BinaryTree.createLeaf(6),
 						BinaryTree.createLeaf(7),
 					),
-				).children.left?.children.left?.depth,
+				).children.left as BinaryTree<number>)?.children.left?.depth,
 			expected: 3,
 		},
 		{
@@ -145,6 +145,19 @@ Deno.test('BinaryTree', async (t) => {
 					BinaryTree.createLeaf(4),
 				).size,
 			expected: 3,
+		},
+		{
+			actual: () =>
+				BinaryTree.create(
+					2,
+					BinaryTree.createLeaf(3),
+					BinaryTree.createLeaf(4),
+				).isLeaf,
+			expected: false,
+		},
+		{
+			actual: () => BinaryTree.createLeaf(3).isLeaf,
+			expected: true,
 		},
 	];
 

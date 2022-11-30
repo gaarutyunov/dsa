@@ -32,7 +32,7 @@
 	"test": {
 		"files": {
 			"include": ["src/"],
-			"exclude": ["src/testdata/"]
+			"exclude": ["src/testdata/", "src/helpers/test_helpers.ts"]
 		}
 	}
 }
