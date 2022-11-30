@@ -12,18 +12,21 @@ export type ValueAndChildren<T> =
 	| [Value<T>]
 	| [Value<T>, [ValueAndChildren<T>, ValueAndChildren<T>]];
 
-class BinaryTreeChildrenProxy<T> extends BaseChildrenProxy<T, BinaryTree<T>> {
+export class BinaryTreeChildrenProxy<
+	T,
+	TT extends BinaryTree<T> = BinaryTree<T>,
+> extends BaseChildrenProxy<T, TT> {
 	/**
 	 * Returns left child of a binary tree
 	 */
-	public get left(): BinaryTree<T> | undefined {
+	public get left(): TT | undefined {
 		return this._tree.isEmpty ? undefined : this.get(0);
 	}
 
 	/**
 	 * Returns right child of a binary tree
 	 */
-	public get right(): BinaryTree<T> | undefined {
+	public get right(): TT | undefined {
 		return this._tree.isEmpty ? undefined : this.get(1);
 	}
 }
@@ -44,10 +47,19 @@ export class BinaryTree<T> extends BaseTree<T, BinaryTreeChildrenProxy<T>> {
 	}
 
 	/**
+	 * Get the size of the tree, i.e. the number of nodes
+	 */
+	public get size(): number {
+		if (this.isEmpty) return 0;
+
+		return 1 + this.children.left!.size + this.children.right!.size;
+	}
+
+	/**
 	 * Creates an empty binary tree
 	 */
-	public static empty<T>(): BinaryTree<T> {
-		return new this<T>();
+	public static empty<T, TT extends BinaryTree<T> = BinaryTree<T>>(): TT {
+		return new this<T>() as TT;
 	}
 
 	/**
@@ -56,20 +68,22 @@ export class BinaryTree<T> extends BaseTree<T, BinaryTreeChildrenProxy<T>> {
 	 * @param left left child
 	 * @param right right child
 	 */
-	public static create<T>(
+	public static create<T, TT extends BinaryTree<T> = BinaryTree<T>>(
 		value: T,
 		left: BinaryTree<T>,
 		right: BinaryTree<T>,
-	): BinaryTree<T> {
-		return new this<T>(value, [left, right]);
+	): TT {
+		return new this<T>(value, [left, right]) as TT;
 	}
 
 	/**
 	 * Creates a leaf with value and two empty children
 	 * @param value
 	 */
-	public static createLeaf<T>(value: T): BinaryTree<T> {
-		return new this<T>(value, [this.empty<T>(), this.empty<T>()]);
+	public static createLeaf<T, TT extends BinaryTree<T> = BinaryTree<T>>(
+		value: T,
+	): TT {
+		return new this<T>(value, [this.empty<T>(), this.empty<T>()]) as TT;
 	}
 
 	/**
@@ -91,14 +105,7 @@ export class BinaryTree<T> extends BaseTree<T, BinaryTreeChildrenProxy<T>> {
 	}
 
 	/**
-	 * Recursively converts a tree to array format,
-	 * where first value is the value of the node
-	 * and second value is the array of children:
-	 * ```ts
-	 * const tree = Tree.create(1, Tree.create(2), Tree.create(3));
-	 *
-	 * tree.toArray() === [1, [[2], [2]]];
-	 * ```
+	 * Recursively converts a tree to array format.
 	 */
 	public toArray(): ValueAndChildren<T> {
 		if (this.allChildren.every((x) => x.isEmpty)) {
@@ -108,6 +115,7 @@ export class BinaryTree<T> extends BaseTree<T, BinaryTreeChildrenProxy<T>> {
 		return [
 			this.value,
 			this.allChildren
+				.filter((x) => !x.isEmpty)
 				.map((x) => x.toArray()) as [
 					ValueAndChildren<T>,
 					ValueAndChildren<T>,

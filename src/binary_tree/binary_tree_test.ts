@@ -137,6 +137,15 @@ Deno.test('BinaryTree', async (t) => {
 			actual: () => BinaryTree.empty<number>().toArray(),
 			expected: [undefined],
 		},
+		{
+			actual: () =>
+				BinaryTree.create(
+					2,
+					BinaryTree.createLeaf(3),
+					BinaryTree.createLeaf(4),
+				).size,
+			expected: 3,
+		},
 	];
 
 	await Promise.all(testCases.map(async ({ actual, expected }, i) => {
